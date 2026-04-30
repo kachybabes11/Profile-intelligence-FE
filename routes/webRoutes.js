@@ -31,27 +31,23 @@ router.get("/", (req, res) => {
 
 // DASHBOARD
 router.get("/dashboard", ensureAuth, async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
 
-    // 🔥 CALL YOUR SERVICE / DB DIRECTLY (NOT HTTP)
-    const profiles = await getAllProfiles({ page });
+  const page = parseInt(req.query.page) || 1;
 
-    return res.render("dashboard", {
-      user: req.user,
-      profiles: profiles.data || profiles,
-      page
-    });
+  const response = await fetch(
+    `${process.env.BACKEND_URL}/api/v1/profiles?page=${page}`,
+    {
+      credentials: "include"
+    }
+  );
 
-  } catch (err) {
-    console.log(err);
+  const data = await response.json();
 
-    return res.render("dashboard", {
-      user: req.user,
-      profiles: [],
-      page: 1
-    });
-  }
+  res.render("dashboard", {
+    user: req.user,
+    profiles: data.data || [],
+    page
+  });
 });
 
 
