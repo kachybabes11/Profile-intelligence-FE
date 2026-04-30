@@ -18,7 +18,7 @@
     </span>
 
     <% if (user?.role === "admin") { %>
-      <a href="/api/v1/profiles/export">Export CSV</a>
+      <a href="/profiles/export">Export CSV</a>
     <% } %>
 
     <form action="/auth/logout" method="GET">
@@ -32,7 +32,8 @@
 <h2>Profiles</h2>
 
 <% if (user?.role === "admin") { %>
-<form action="/api/v1/profiles" method="POST">
+<form action="/profiles" method="POST">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
   <input type="text" name="name" placeholder="Enter name" required />
   <button>Create</button>
 </form>
@@ -64,7 +65,8 @@
 
     <% if (user?.role === "admin") { %>
     <td>
-      <form action="/api/v1/profiles/<%= profile.id %>?_method=DELETE" method="POST">
+      <form action="/profiles/<%= profile.id %>?_method=DELETE" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <button>Delete</button>
       </form>
     </td>
