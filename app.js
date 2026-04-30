@@ -1,6 +1,5 @@
 import express from "express";
 import session from "express-session";
-import passport from "passport";
 import methodOverride from "method-override";
 import webRoutes from "./routes/webRoutes.js";
 import cors from "cors";
@@ -26,10 +25,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
-
-// passport
-app.use(passport.initialize());
-app.use(passport.session());
 
 // EJS
 app.set("view engine", "ejs");
