@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="left">
+    <h2>Insighta Dashboard</h2>
+  </div>
+
+  <div class="right">
+    <span>
+      <%= user?.username || "Guest" %>
+      (<%= user?.role %>)
+    </span>
+
+    <% if (user?.role === "admin") { %>
+      <a href="/api/v1/profiles/export">Export CSV</a>
+    <% } %>
+
+    <form action="/auth/logout" method="GET">
+      <button>Logout</button>
+    </form>
+  </div>
+</header>
+
+<div class="container">
+
+<h2>Profiles</h2>
+
+<% if (user?.role === "admin") { %>
+<form action="/api/v1/profiles" method="POST">
+  <input type="text" name="name" placeholder="Enter name" required />
+  <button>Create</button>
+</form>
+<% } %>
+
+<br/>
+
+<% if (!profiles || profiles.length === 0) { %>
+  <p>No profiles found</p>
+<% } %>
+
+<table border="1" width="100%">
+  <tr>
+    <th>Name</th>
+    <th>Age</th>]
+    <th>Gender</th>
+    <th>Country</th>
+    <% if (user?.role === "admin") { %>
+      <th>Action</th>
+    <% } %>
+  </tr>
+
+  <% (profiles || []).forEach(profile => { %>
+  <tr>
+    <td><%= profile.name %></td>
+    <td><%= profile.age %></td>
+    <td><%= profile.gender %></td>
+    <td><%= profile.country_id %></td>
+
+    <% if (user?.role === "admin") { %>
+    <td>
+      <form action="/api/v1/profiles/<%= profile.id %>?_method=DELETE" method="POST">
+        <button>Delete</button>
+      </form>
+    </td>
+    <% } %>
+  </tr>
+  <% }) %>
+
+</table>
+
+<br/>
+
+<div>
+  <% if (page > 1) { %>
+    <a href="/dashboard?page=<%= page - 1 %>">Prev</a>
+  <% } %>
+
+  <span>Page <%= page %></span>
+
+  <a href="/dashboard?page=<%= page + 1 %>">Next</a>
+</div>
+
+</div>
+
+</body>
+</html>
