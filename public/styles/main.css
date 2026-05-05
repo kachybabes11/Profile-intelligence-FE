@@ -63,6 +63,16 @@ body {
   line-height: 1.6;
 }
 
+.login-error {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
 .github-btn {
   display: inline-flex;
   align-items: center;

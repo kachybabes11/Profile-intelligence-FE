@@ -15,6 +15,10 @@
   </div>
 
   <div class="login-content">
+    <% if (error) { %>
+      <div class="login-error"><%= error %></div>
+    <% } %>
+
     <p class="login-description">
       Sign in with your GitHub account to access the profile intelligence dashboard.
     </p>

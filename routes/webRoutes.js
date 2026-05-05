@@ -52,14 +52,58 @@ router.get("/", (req, res) => {
   }
 
   res.render("login", {
-    oauthUrl: `${getBackendUrl()}/auth/github`
+    oauthUrl: `${getBackendUrl()}/auth/github`,
+    error: req.query.error || null
   });
 });
 
-router.get("/auth/callback", (req, res) => {
+router.get(["/auth/callback", "/auth/github/callback"], (req, res) => {
   const accessToken = req.query.accessToken || req.query.access_token || req.query.token || req.query.access;
   const refreshToken = req.query.refreshToken || req.query.refresh_token || req.query.refresh;
   const isProduction = process.env.NODE_ENV === "production";
+
+  console.log('auth callback reached', { query: req.query });
+
+  if (!accessToken && !refreshToken) {
+    return res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Authentication Redirect</title>
+  <style>body{font-family:system-ui,sans-serif;background:#f8fafc;color:#334155;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.card{max-width:460px;padding:24px;background:white;border-radius:16px;box-shadow:0 20px 40px rgba(15,23,42,0.1);text-align:center}</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Processing login...</h1>
+    <p>If you are not redirected automatically, click continue.</p>
+    <button id="continue">Continue</button>
+  </div>
+  <script>
+    const url = new URL(window.location.href);
+    const query = new URLSearchParams(url.search.slice(1));
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+
+    for (const [key, value] of hash.entries()) {
+      if (!query.has(key)) {
+        query.set(key, value);
+      }
+    }
+
+    if (query.has('accessToken') || query.has('access_token') || query.has('token') || query.has('access')) {
+      window.location.replace(url.pathname + '?' + query.toString());
+    }
+
+    document.getElementById('continue').addEventListener('click', () => {
+      if (query.toString()) {
+        window.location.replace(url.pathname + '?' + query.toString());
+      } else {
+        window.location.replace('/');
+      }
+    });
+  <\/script>
+</body>
+</html>`);
+  }
 
   if (accessToken) {
     res.cookie("accessToken", accessToken, {
