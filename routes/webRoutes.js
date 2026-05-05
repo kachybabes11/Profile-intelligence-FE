@@ -74,10 +74,11 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
   try {
     const backendUrl = (process.env.BACKEND_URL || "").replace(/\/$/, "");
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/v1/profiles?page=${page}`,
+      `${backendUrl}/api/profiles?page=${page}`,
       {
         headers: {
-          Authorization: `Bearer ${req.cookies.accessToken}`
+          Authorization: `Bearer ${req.cookies.accessToken}`,
+          "x-api-version": "1"
         }
       }
     );
