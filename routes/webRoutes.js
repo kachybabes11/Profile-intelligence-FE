@@ -75,7 +75,7 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
 
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles?page=${page}`, {
+    const response = await fetch(`${backendUrl}/api/profiles?page=${page}`, {
       headers: buildBackendHeaders(req)
     });
 
