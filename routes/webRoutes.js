@@ -22,30 +22,9 @@ function buildBackendHeaders(req) {
   return headers;
 }
 
-async function ensureAuth(req, res, next) {
-  try {
-    const backendUrl = getBackendUrl();
-    const meResponse = await fetch(`${backendUrl}/auth/me`, {
-      headers: buildBackendHeaders(req)
-    });
-
-    if (!meResponse.ok) {
-      return res.redirect("/");
-    }
-
-    const meData = await meResponse.json();
-    if (!meData || meData.status !== "success" || !meData.data) {
-      return res.redirect("/");
-    }
-
-    req.user = meData.data;
-    return next();
-  } catch (err) {
-    console.error('Authentication validation failed:', err);
-    return res.redirect("/");
-  }
-}
-
+// =====================
+// LOGIN PAGE ONLY
+// =====================
 router.get("/", (req, res) => {
   if (req.cookies?.accessToken) {
     return res.redirect("/dashboard");
@@ -57,314 +36,58 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get(["/auth/callback", "/auth/github/callback"], (req, res) => {
-  const accessToken = req.query.accessToken || req.query.access_token || req.query.token || req.query.access;
-  const refreshToken = req.query.refreshToken || req.query.refresh_token || req.query.refresh;
-  const isProduction = process.env.NODE_ENV === "production";
+// =====================
+// AUTH CHECK
+// =====================
+async function ensureAuth(req, res, next) {
+  try {
+    const backendUrl = getBackendUrl();
 
-  console.log('auth callback reached', { query: req.query });
+    const meResponse = await fetch(`${backendUrl}/auth/me`, {
+      headers: buildBackendHeaders(req)
+    });
 
-  if (!accessToken && !refreshToken) {
-    return res.send(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Authentication Redirect</title>
-  <style>body{font-family:system-ui,sans-serif;background:#f8fafc;color:#334155;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.card{max-width:460px;padding:24px;background:white;border-radius:16px;box-shadow:0 20px 40px rgba(15,23,42,0.1);text-align:center}</style>
-</head>
-<body>
-  <div class="card">
-    <h1>Processing login...</h1>
-    <p>If you are not redirected automatically, click continue.</p>
-    <button id="continue">Continue</button>
-  </div>
-  <script>
-    const url = new URL(window.location.href);
-    const query = new URLSearchParams(url.search.slice(1));
-    const hash = new URLSearchParams(window.location.hash.slice(1));
-
-    for (const [key, value] of hash.entries()) {
-      if (!query.has(key)) {
-        query.set(key, value);
-      }
+    if (!meResponse.ok) {
+      return res.redirect("/");
     }
 
-    if (query.has('accessToken') || query.has('access_token') || query.has('token') || query.has('access')) {
-      window.location.replace(url.pathname + '?' + query.toString());
+    const meData = await meResponse.json();
+
+    if (!meData?.data) {
+      return res.redirect("/");
     }
 
-    document.getElementById('continue').addEventListener('click', () => {
-      if (query.toString()) {
-        window.location.replace(url.pathname + '?' + query.toString());
-      } else {
-        window.location.replace('/');
-      }
-    });
-  <\/script>
-</body>
-</html>`);
+    req.user = meData.data;
+    return next();
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/");
   }
+}
 
-  if (accessToken) {
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax",
-      path: "/"
-    });
-  }
-
-  if (refreshToken) {
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax",
-      path: "/"
-    });
-  }
-
-  return res.redirect("/dashboard");
-});
-
+// =====================
+// DASHBOARD
+// =====================
 router.get("/dashboard", ensureAuth, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
 
-  try {
-    const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/profiles?page=${page}`, {
-      headers: buildBackendHeaders(req)
-    });
+  const backendUrl = getBackendUrl();
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        return res.redirect("/");
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return res.render("dashboard", {
-      user: req.user,
-      metrics: {
-        totalProfiles: data.total || 0,
-        totalPages: data.total_pages || 1,
-        currentPage: data.page || page
-      },
-      profiles: data.data || [],
-      page,
-      error: null
-    });
-  } catch (error) {
-    console.error('Dashboard error:', error);
-    return res.render("dashboard", {
-      user: req.user,
-      metrics: {
-        totalProfiles: 0,
-        totalPages: 1,
-        currentPage: page
-      },
-      profiles: [],
-      page,
-      error: "Failed to load dashboard data. Please try again."
-    });
-  }
-});
-
-router.get("/profiles", ensureAuth, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const query = (req.query.q || "").trim();
-
-  try {
-    const backendUrl = getBackendUrl();
-    const endpoint = query
-      ? `${backendUrl}/api/profiles/search?q=${encodeURIComponent(query)}&page=${page}`
-      : `${backendUrl}/api/profiles?page=${page}`;
-
-    const response = await fetch(endpoint, {
-      headers: buildBackendHeaders(req)
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        return res.redirect("/");
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return res.render("profiles", {
-      user: req.user,
-      profiles: data.data || [],
-      page,
-      query,
-      error: null
-    });
-  } catch (error) {
-    console.error('Profiles error:', error);
-    return res.render("profiles", {
-      user: req.user,
-      profiles: [],
-      page,
-      query,
-      error: "Unable to load profiles. Please refresh the page."
-    });
-  }
-});
-
-router.get("/profiles/:id", ensureAuth, async (req, res) => {
-  try {
-    const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
-      headers: buildBackendHeaders(req)
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        return res.redirect("/");
-      }
-      if (response.status === 404) {
-        return res.render("profileDetail", {
-          user: req.user,
-          profile: null
-        });
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return res.render("profileDetail", {
-      user: req.user,
-      profile: data.data
-    });
-  } catch (error) {
-    console.error('Profile detail error:', error);
-    return res.render("profileDetail", {
-      user: req.user,
-      profile: null
-    });
-  }
-});
-
-router.get("/search", ensureAuth, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const searchQuery = (req.query.q || "").trim();
-
-  try {
-    let profiles = [];
-    let error = null;
-
-    if (searchQuery) {
-      const backendUrl = getBackendUrl();
-      const response = await fetch(
-        `${backendUrl}/api/profiles/search?q=${encodeURIComponent(searchQuery)}&page=${page}`,
-        {
-          headers: buildBackendHeaders(req)
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          return res.redirect("/");
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      profiles = data.data || [];
-    }
-
-    return res.render("search", {
-      user: req.user,
-      profiles,
-      searchQuery,
-      page,
-      error: null
-    });
-  } catch (error) {
-    console.error('Search page error:', error);
-    return res.render("search", {
-      user: req.user,
-      profiles: [],
-      searchQuery,
-      page,
-      error: "Search failed. Please try again."
-    });
-  }
-});
-
-router.get("/account", ensureAuth, (req, res) => {
-  res.render("account", {
-    user: req.user
+  const response = await fetch(`${backendUrl}/api/profiles?page=${page}`, {
+    headers: buildBackendHeaders(req)
   });
-});
 
-router.post("/profiles", ensureAuth, async (req, res) => {
-  try {
-    const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/profiles`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...buildBackendHeaders(req)
-      },
-      body: JSON.stringify({ name: req.body.name })
-    });
+  const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  return res.render("dashboard", {
+    user: req.user,
+    profiles: data.data || [],
+    page,
+    metrics: {
+      totalProfiles: data.total || 0,
+      totalPages: data.total_pages || 1
     }
-
-    return res.redirect('/profiles');
-  } catch (error) {
-    console.error('Create profile error:', error);
-    return res.redirect('/profiles?error=create_failed');
-  }
-});
-
-router.delete("/profiles/:id", ensureAuth, async (req, res) => {
-  try {
-    const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
-      method: 'DELETE',
-      headers: buildBackendHeaders(req)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return res.redirect('/profiles');
-  } catch (error) {
-    console.error('Delete profile error:', error);
-    return res.redirect('/profiles?error=delete_failed');
-  }
-});
-
-router.get("/export", ensureAuth, async (req, res) => {
-  try {
-    const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/profiles/export`, {
-      headers: buildBackendHeaders(req)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const csvData = await response.text();
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="profiles.csv"');
-    return res.send(csvData);
-  } catch (error) {
-    console.error('Export error:', error);
-    return res.redirect('/profiles?error=export_failed');
-  }
-});
-
-router.get("/auth/logout", (req, res) => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
-  return res.redirect('/');
+  });
 });
 
 export default router;
