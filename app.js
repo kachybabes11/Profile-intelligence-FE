@@ -7,19 +7,14 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
-// body parser
 app.use(express.urlencoded({ extended: true }));
-
-// static
 app.use(express.static("public"));
 
 // method override
 app.use(methodOverride("_method"));
 
-// ✅ COOKIE PARSER (IMPORTANT for JWT auth)
 app.use(cookieParser());
 
-// session (still OK if you're using passport elsewhere)
 app.use(session({
   secret: "secret",
   resave: false,
@@ -28,6 +23,17 @@ app.use(session({
 
 // EJS
 app.set("view engine", "ejs");
+
+// Health check
+app.get("/health", (req, res) => {
+  console.log("Health endpoint called");
+  res.json({
+    status: "ok",
+    service: "insighta-frontend",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
+  });
+});
 
 // routes
 app.use("/", webRoutes);
