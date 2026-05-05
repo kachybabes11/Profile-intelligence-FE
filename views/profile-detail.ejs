@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= profile?.name || 'Profile' %> - Insighta</title>
+  <link rel="stylesheet" href="/styles/dashboard.css">
+  <style>
+    .profile-detail {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .profile-detail h3 {
+      margin-top: 24px;
+      margin-bottom: 16px;
+      color: #1e293b;
+      font-size: 18px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .detail-row strong {
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .detail-row span {
+      color: #334155;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #5a67d8;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="left">
+    <h2>Profile Details</h2>
+    <div class="sub">Profile Intelligence System</div>
+  </div>
+
+  <div class="right">
+    <span class="user">
+      <%= user?.username || "Guest" %>
+      (<%= user?.role || "user" %>)
+    </span>
+    <a href="/account">Account</a>
+    <a href="/auth/logout" class="logout-btn">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+  <a href="/profiles" class="back-btn">← Back to Profiles</a>
+
+  <% if (error) { %>
+    <div class="error-message"><%= error %></div>
+  <% } %>
+
+  <div class="profile-detail">
+    <h2><%= profile?.name || 'Unknown' %></h2>
+
+    <h3>Personal Information</h3>
+    <div class="detail-row">
+      <strong>ID:</strong>
+      <span><%= profile?.id || 'N/A' %></span>
+    </div>
+    <div class="detail-row">
+      <strong>Age:</strong>
+      <span><%= profile?.age || 'N/A' %></span>
+    </div>
+    <div class="detail-row">
+      <strong>Gender:</strong>
+      <span><%= profile?.gender || 'N/A' %></span>
+    </div>
+    <div class="detail-row">
+      <strong>Country:</strong>
+      <span><%= profile?.country_id || 'N/A' %></span>
+    </div>
+
+    <% if (profile?.email) { %>
+      <h3>Contact</h3>
+      <div class="detail-row">
+        <strong>Email:</strong>
+        <span><%= profile.email %></span>
+      </div>
+    <% } %>
+
+    <% if (profile?.phone) { %>
+      <div class="detail-row">
+        <strong>Phone:</strong>
+        <span><%= profile.phone %></span>
+      </div>
+    <% } %>
+
+    <h3>Metadata</h3>
+    <div class="detail-row">
+      <strong>Created:</strong>
+      <span><%= profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A' %></span>
+    </div>
+    <div class="detail-row">
+      <strong>Updated:</strong>
+      <span><%= profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString() : 'N/A' %></span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

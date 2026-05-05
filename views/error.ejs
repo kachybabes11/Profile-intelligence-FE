@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Error - Insighta</title>
+  <link rel="stylesheet" href="/styles/dashboard.css">
+  <style>
+    .error-container {
+      background: white;
+      padding: 48px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 48px auto;
+      text-align: center;
+    }
+
+    .error-container h2 {
+      color: #dc2626;
+      margin: 0 0 16px 0;
+    }
+
+    .error-container p {
+      color: #64748b;
+      margin: 0 0 24px 0;
+    }
+
+    .error-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .error-btn:hover {
+      background: #5a67d8;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="left">
+    <h2>Error</h2>
+    <div class="sub">Profile Intelligence System</div>
+  </div>
+
+  <div class="right">
+    <% if (user?.username) { %>
+      <span class="user"><%= user.username %> (<%= user.role || "user" %>)</span>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    <% } else { %>
+      <a href="/" class="logout-btn">Back to Login</a>
+    <% } %>
+  </div>
+</header>
+
+<div class="container">
+  <div class="error-container">
+    <h2>⚠️ Error</h2>
+    <p><%= message || "An unexpected error occurred. Please try again." %></p>
+    <% if (user?.username) { %>
+      <a href="/dashboard" class="error-btn">Return to Dashboard</a>
+    <% } else { %>
+      <a href="/" class="error-btn">Return to Login</a>
+    <% } %>
+  </div>
+</div>
+
+</body>
+</html>

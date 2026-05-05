@@ -1,85 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profiles - Insighta</title>
-  <link rel="stylesheet" href="/styles/app.css" />
+  <link rel="stylesheet" href="/styles/dashboard.css">
 </head>
 <body>
-  <%- include('partials/nav', { user, activePage: 'profiles' }) %>
 
-  <main class="page-container">
-    <section class="page-header">
-      <div>
-        <h1>Profiles</h1>
-        <p>Browse, filter and manage your profile records.</p>
-      </div>
-      <div class="page-actions">
-        <a href="/search" class="button secondary">Search Profiles</a>
-      </div>
-    </section>
+<header class="header">
+  <div class="left">
+    <h2>Profiles</h2>
+    <div class="sub">Profile Intelligence System</div>
+  </div>
 
-    <section class="panel">
-      <form class="filter-bar" method="GET" action="/profiles">
-        <input type="text" name="q" value="<%= query %>" placeholder="Search by name, country, gender..." />
-        <button type="submit" class="button">Filter</button>
-      </form>
+  <div class="right">
+    <span class="user">
+      <%= user?.username || "Guest" %>
+      (<%= user?.role || "user" %>)
+    </span>
 
-      <% if (error) { %>
-        <div class="alert error"><%= error %></div>
-      <% } %>
-
-      <% if (!profiles || profiles.length === 0) { %>
-        <div class="empty-state">
-          <p>No profiles match your criteria.</p>
-          <p>Try a broader search or create a new profile if you have admin access.</p>
-        </div>
-      <% } else { %>
-        <div class="table-card">
-          <div class="table-row table-head">
-            <div>Name</div>
-            <div>Age</div>
-            <div>Gender</div>
-            <div>Country</div>
-            <div>Actions</div>
-          </div>
-
-          <% profiles.forEach(profile => { %>
-            <div class="table-row">
-              <div><a class="link-button" href="/profiles/<%= profile.id %>"><%= profile.name || 'N/A' %></a></div>
-              <div><%= profile.age || 'N/A' %></div>
-              <div><%= profile.gender || 'N/A' %></div>
-              <div><%= profile.country_name || profile.country_id || 'N/A' %></div>
-              <div>
-                <a class="small-link" href="/profiles/<%= profile.id %>">View</a>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-
-        <div class="pagination">
-          <% if (page > 1) { %>
-            <a href="/profiles?page=<%= page - 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="button secondary">Previous</a>
-          <% } %>
-          <span>Page <%= page %></span>
-          <% if (profiles.length > 0) { %>
-            <a href="/profiles?page=<%= page + 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="button secondary">Next</a>
-          <% } %>
-        </div>
-      <% } %>
-    </section>
-
-    <% if (user.role === 'admin') { %>
-      <section class="panel small-panel">
-        <h2>Create New Profile</h2>
-        <form action="/profiles" method="POST" class="create-form">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <input type="text" name="name" placeholder="Profile name" required />
-          <button type="submit" class="button">Create Profile</button>
-        </form>
-      </section>
+    <% if (user?.role === "admin") { %>
+      <a href="/export">Export CSV</a>
     <% } %>
-  </main>
+
+    <a href="/account">Account</a>
+    <a href="/auth/logout" class="logout-btn">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+  <h2>Manage Profiles</h2>
+
+  <% if (error) { %>
+    <div class="error-message"><%= error %></div>
+  <% } %>
+
+  <div class="search-section">
+    <form action="/profiles" method="GET" class="search-form">
+      <input type="text" name="q" value="<%= query %>" placeholder="Search profiles by name..." />
+      <button type="submit" class="search-btn">Search</button>
+      <% if (query) { %>
+        <a href="/profiles" class="clear-search">Clear Search</a>
+      <% } %>
+    </form>
+  </div>
+
+  <% if (user?.role === "admin") { %>
+    <div class="create-profile">
+      <form action="/profiles" method="POST" class="profile-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="text" name="name" placeholder="Enter profile name" required />
+        <button type="submit" class="create-btn">Create Profile</button>
+      </form>
+    </div>
+  <% } %>
+
+  <% if (!profiles || profiles.length === 0) { %>
+    <div class="no-profiles">
+      <p>No profiles found. <%= user?.role === "admin" ? "Create your first profile above." : "Contact an administrator to create profiles." %></p>
+    </div>
+  <% } else { %>
+    <div class="sheet">
+      <div class="row table-header">
+        <div>Name</div>
+        <div>Age</div>
+        <div>Gender</div>
+        <div>Country</div>
+        <div>Actions</div>
+      </div>
+
+      <% profiles.forEach(profile => { %>
+        <div class="row">
+          <div><a href="/profiles/<%= profile.id %>" class="profile-link"><%= profile.name || 'N/A' %></a></div>
+          <div><%= profile.age || 'N/A' %></div>
+          <div><%= profile.gender || 'N/A' %></div>
+          <div><%= profile.country_id || 'N/A' %></div>
+          <div class="actions">
+            <a href="/profiles/<%= profile.id %>" class="view-btn">View</a>
+            <% if (user?.role === "admin") { %>
+              <form action="/profiles/<%= profile.id %>?_method=DELETE" method="POST" class="delete-form" onsubmit="return confirm('Are you sure?');" style="display:inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit" class="delete-btn">Delete</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <div class="pagination">
+    <% if (page > 1) { %>
+      <a href="/profiles?page=<%= page - 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="page-btn">Previous</a>
+    <% } %>
+
+    <span class="page-info">Page <%= page %></span>
+
+    <% if (profiles && profiles.length > 0) { %>
+      <a href="/profiles?page=<%= page + 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="page-btn">Next</a>
+    <% } %>
+  </div>
+</div>
+
 </body>
 </html>
