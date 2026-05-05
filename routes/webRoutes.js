@@ -11,10 +11,6 @@ function buildBackendHeaders(req) {
     "x-api-version": "1"
   };
 
-  if (req.cookies?.accessToken) {
-    headers.Authorization = `Bearer ${req.cookies.accessToken}`;
-  }
-
   if (req.headers?.cookie) {
     headers.Cookie = req.headers.cookie;
   }
@@ -77,26 +73,8 @@ async function ensureAuth(req, res, next) {
 }
 
 router.get("/auth/callback", (req, res) => {
-  const { accessToken, refreshToken } = req.query;
-
-  if (!accessToken) {
-    return res.redirect("/");
-  }
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/"
-  });
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/"
-  });
-
+  // Backend now sets cookies directly during OAuth callback.
+  // This route remains as a compatibility fallback for legacy redirects.
   return res.redirect("/dashboard");
 });
 
