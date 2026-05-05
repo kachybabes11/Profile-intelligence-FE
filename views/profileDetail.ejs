@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Detail - Insighta</title>
+  <link rel="stylesheet" href="/styles/app.css" />
+</head>
+<body>
+  <%- include('partials/nav', { user, activePage: 'profiles' }) %>
+
+  <main class="page-container">
+    <section class="page-header">
+      <div>
+        <h1>Profile detail</h1>
+        <p>Detailed information for the selected profile.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/profiles" class="button secondary">Back to Profiles</a>
+      </div>
+    </section>
+
+    <section class="panel detail-panel">
+      <% if (!profile) { %>
+        <div class="empty-state">
+          <p>Profile not found.</p>
+        </div>
+      <% } else { %>
+        <div class="detail-grid">
+          <div><strong>Name</strong></div>
+          <div><%= profile.name || 'N/A' %></div>
+          <div><strong>Age</strong></div>
+          <div><%= profile.age || 'N/A' %></div>
+          <div><strong>Gender</strong></div>
+          <div><%= profile.gender || 'N/A' %></div>
+          <div><strong>Country</strong></div>
+          <div><%= profile.country_name || profile.country_id || 'N/A' %></div>
+          <div><strong>Age Group</strong></div>
+          <div><%= profile.age_group || 'N/A' %></div>
+          <div><strong>Created At</strong></div>
+          <div><%= profile.created_at ? new Date(profile.created_at).toLocaleString() : 'N/A' %></div>
+          <div><strong>Created By</strong></div>
+          <div><%= profile.created_by || 'N/A' %></div>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

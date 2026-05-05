@@ -25,7 +25,7 @@ function buildBackendHeaders(req) {
 async function ensureAuth(req, res, next) {
   try {
     const backendUrl = getBackendUrl();
-    const meResponse = await fetch(`${backendUrl}/insighta/me`, {
+    const meResponse = await fetch(`${backendUrl}/auth/me`, {
       headers: buildBackendHeaders(req)
     });
 
@@ -33,7 +33,12 @@ async function ensureAuth(req, res, next) {
       return res.redirect("/");
     }
 
-    req.user = await meResponse.json();
+    const meData = await meResponse.json();
+    if (!meData || meData.status !== "success" || !meData.data) {
+      return res.redirect("/");
+    }
+
+    req.user = meData.data;
     return next();
   } catch (err) {
     console.error('Authentication validation failed:', err);
@@ -89,8 +94,12 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
     const data = await response.json();
     return res.render("dashboard", {
       user: req.user,
+      metrics: {
+        totalProfiles: data.total || 0,
+        totalPages: data.total_pages || 1,
+        currentPage: data.page || page
+      },
       profiles: data.data || [],
-      pagination: data.pagination || {},
       page,
       error: null
     });
@@ -98,25 +107,29 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
     console.error('Dashboard error:', error);
     return res.render("dashboard", {
       user: req.user,
+      metrics: {
+        totalProfiles: 0,
+        totalPages: 1,
+        currentPage: page
+      },
       profiles: [],
-      pagination: {},
       page,
-      error: "Failed to load profiles. Please try again."
+      error: "Failed to load dashboard data. Please try again."
     });
   }
 });
 
-router.get("/profiles/search", ensureAuth, async (req, res) => {
-  const query = req.query.q || '';
+router.get("/profiles", ensureAuth, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-
-  if (!query.trim()) {
-    return res.redirect('/dashboard');
-  }
+  const query = (req.query.q || "").trim();
 
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/search?q=${encodeURIComponent(query)}&page=${page}`, {
+    const endpoint = query
+      ? `${backendUrl}/api/profiles/search?q=${encodeURIComponent(query)}&page=${page}`
+      : `${backendUrl}/api/profiles?page=${page}`;
+
+    const response = await fetch(endpoint, {
       headers: buildBackendHeaders(req)
     });
 
@@ -128,31 +141,116 @@ router.get("/profiles/search", ensureAuth, async (req, res) => {
     }
 
     const data = await response.json();
-    return res.render("dashboard", {
+    return res.render("profiles", {
       user: req.user,
       profiles: data.data || [],
-      pagination: data.pagination || {},
       page,
-      searchQuery: query,
+      query,
       error: null
     });
   } catch (error) {
-    console.error('Search error:', error);
-    return res.render("dashboard", {
+    console.error('Profiles error:', error);
+    return res.render("profiles", {
       user: req.user,
       profiles: [],
-      pagination: {},
       page,
-      searchQuery: query,
+      query,
+      error: "Unable to load profiles. Please refresh the page."
+    });
+  }
+});
+
+router.get("/profiles/:id", ensureAuth, async (req, res) => {
+  try {
+    const backendUrl = getBackendUrl();
+    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
+      headers: buildBackendHeaders(req)
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        return res.redirect("/");
+      }
+      if (response.status === 404) {
+        return res.render("profileDetail", {
+          user: req.user,
+          profile: null
+        });
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return res.render("profileDetail", {
+      user: req.user,
+      profile: data.data
+    });
+  } catch (error) {
+    console.error('Profile detail error:', error);
+    return res.render("profileDetail", {
+      user: req.user,
+      profile: null
+    });
+  }
+});
+
+router.get("/search", ensureAuth, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const searchQuery = (req.query.q || "").trim();
+
+  try {
+    let profiles = [];
+    let error = null;
+
+    if (searchQuery) {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(
+        `${backendUrl}/api/profiles/search?q=${encodeURIComponent(searchQuery)}&page=${page}`,
+        {
+          headers: buildBackendHeaders(req)
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return res.redirect("/");
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      profiles = data.data || [];
+    }
+
+    return res.render("search", {
+      user: req.user,
+      profiles,
+      searchQuery,
+      page,
+      error: null
+    });
+  } catch (error) {
+    console.error('Search page error:', error);
+    return res.render("search", {
+      user: req.user,
+      profiles: [],
+      searchQuery,
+      page,
       error: "Search failed. Please try again."
     });
   }
 });
 
+router.get("/account", ensureAuth, (req, res) => {
+  res.render("account", {
+    user: req.user
+  });
+});
+
 router.post("/profiles", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles`, {
+    const response = await fetch(`${backendUrl}/api/profiles`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -165,17 +263,17 @@ router.post("/profiles", ensureAuth, async (req, res) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return res.redirect('/dashboard');
+    return res.redirect('/profiles');
   } catch (error) {
     console.error('Create profile error:', error);
-    return res.redirect('/dashboard?error=create_failed');
+    return res.redirect('/profiles?error=create_failed');
   }
 });
 
 router.delete("/profiles/:id", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/${req.params.id}`, {
+    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
       method: 'DELETE',
       headers: buildBackendHeaders(req)
     });
@@ -184,17 +282,17 @@ router.delete("/profiles/:id", ensureAuth, async (req, res) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return res.redirect('/dashboard');
+    return res.redirect('/profiles');
   } catch (error) {
     console.error('Delete profile error:', error);
-    return res.redirect('/dashboard?error=delete_failed');
+    return res.redirect('/profiles?error=delete_failed');
   }
 });
 
 router.get("/export", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/export`, {
+    const response = await fetch(`${backendUrl}/api/profiles/export`, {
       headers: buildBackendHeaders(req)
     });
 
@@ -208,7 +306,7 @@ router.get("/export", ensureAuth, async (req, res) => {
     return res.send(csvData);
   } catch (error) {
     console.error('Export error:', error);
-    return res.redirect('/dashboard?error=export_failed');
+    return res.redirect('/profiles?error=export_failed');
   }
 });
 

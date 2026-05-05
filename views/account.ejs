@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account - Insighta</title>
+  <link rel="stylesheet" href="/styles/app.css" />
+</head>
+<body>
+  <%- include('partials/nav', { user, activePage: 'account' }) %>
+
+  <main class="page-container">
+    <section class="page-header">
+      <div>
+        <h1>Account</h1>
+        <p>Manage your account access and view your current profile.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/dashboard" class="button secondary">Dashboard</a>
+      </div>
+    </section>
+
+    <section class="panel detail-panel">
+      <div class="detail-grid">
+        <div><strong>Username</strong></div>
+        <div><%= user.username %></div>
+        <div><strong>Email</strong></div>
+        <div><%= user.email %></div>
+        <div><strong>Role</strong></div>
+        <div><%= user.role %></div>
+        <div><strong>GitHub</strong></div>
+        <div><%= user.github_id || 'Connected' %></div>
+      </div>
+    </section>
+
+    <section class="panel small-panel">
+      <h2>Security</h2>
+      <p>Use logout to end this session and sign in again safely.</p>
+      <a class="button logout" href="/auth/logout">Sign out</a>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,29 +1,47 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   margin: 0;
   padding: 20px;
 }
 
 .login-container {
   width: 100%;
-  max-width: 400px;
-  padding: 40px;
+  max-width: 420px;
+  padding: 48px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
+  margin: 0 0 12px 0;
+  font-size: 36px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -32,82 +50,72 @@ body {
 }
 
 .login-header p {
-  margin: 0 0 32px 0;
+  margin: 0 0 40px 0;
   color: #64748b;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
 }
 
 .login-description {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
   color: #475569;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .github-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 16px 24px;
+  width: 100%;
+  padding: 14px 24px;
   background: #24292e;
   color: white;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 16px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid #24292e;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(36, 41, 46, 0.15);
+  cursor: pointer;
 }
 
 .github-btn:hover {
   background: #1a1e22;
   border-color: #1a1e22;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(36, 41, 46, 0.2);
+}
+
+.github-btn:active {
+  transform: translateY(0);
 }
 
 .github-icon {
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 480px) {
   .login-container {
-    padding: 32px 24px;
-    margin: 20px;
+    padding: 40px 24px;
   }
 
   .login-header h1 {
-    font-size: 28px;
+    font-size: 32px;
+  }
+
+  .login-header p {
+    margin-bottom: 32px;
   }
 
   .github-btn {
-    padding: 14px 20px;
+    padding: 13px 20px;
     font-size: 15px;
   }
 }
-  background: #333;
-}
 
-.divider {
-  margin: 15px 0;
-  font-size: 12px;
-  color: gray;
-}
-
-.github-btn {
-  display: block;
-  padding: 12px;
-  background: #0dc861;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-}
-
-.github-btn:hover {
-  background: #5df28a;
-}
 

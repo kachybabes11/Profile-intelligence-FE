@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search - Insighta</title>
+  <link rel="stylesheet" href="/styles/app.css" />
+</head>
+<body>
+  <%- include('partials/nav', { user, activePage: 'search' }) %>
+
+  <main class="page-container">
+    <section class="page-header">
+      <div>
+        <h1>Search Profiles</h1>
+        <p>Enter keywords, names or attributes to find matching profiles.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/profiles" class="button secondary">All Profiles</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form class="filter-bar" method="GET" action="/search">
+        <input type="text" name="q" value="<%= searchQuery %>" placeholder="Search by name, gender, country, age..." />
+        <button type="submit" class="button">Search</button>
+      </form>
+
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+
+      <% if (!searchQuery) { %>
+        <div class="empty-state">
+          <p>Please enter a search query to find profiles.</p>
+        </div>
+      <% } else if (!profiles || profiles.length === 0) { %>
+        <div class="empty-state">
+          <p>No profiles found for "<%= searchQuery %>".</p>
+        </div>
+      <% } else { %>
+        <div class="table-card">
+          <div class="table-row table-head">
+            <div>Name</div>
+            <div>Age</div>
+            <div>Gender</div>
+            <div>Country</div>
+            <div>Details</div>
+          </div>
+          <% profiles.forEach(profile => { %>
+            <div class="table-row">
+              <div><%= profile.name || 'N/A' %></div>
+              <div><%= profile.age || 'N/A' %></div>
+              <div><%= profile.gender || 'N/A' %></div>
+              <div><%= profile.country_name || profile.country_id || 'N/A' %></div>
+              <div><a class="small-link" href="/profiles/<%= profile.id %>">View</a></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="pagination">
+          <% if (page > 1) { %>
+            <a href="/search?q=<%= encodeURIComponent(searchQuery) %>&page=<%= page - 1 %>" class="button secondary">Previous</a>
+          <% } %>
+          <span>Page <%= page %></span>
+          <% if (profiles.length > 0) { %>
+            <a href="/search?q=<%= encodeURIComponent(searchQuery) %>&page=<%= page + 1 %>" class="button secondary">Next</a>
+          <% } %>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

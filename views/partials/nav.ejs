@@ -1,0 +1,20 @@
+<header class="topbar">
+  <div class="brand-group">
+    <div class="brand-title">
+      <a href="/dashboard">Insighta</a>
+    </div>
+    <div class="brand-subtitle">Profile intelligence for your team</div>
+  </div>
+
+  <nav class="nav-links">
+    <a href="/dashboard" class="<%= activePage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+    <a href="/profiles" class="<%= activePage === 'profiles' ? 'active' : '' %>">Profiles</a>
+    <a href="/search" class="<%= activePage === 'search' ? 'active' : '' %>">Search</a>
+    <a href="/account" class="<%= activePage === 'account' ? 'active' : '' %>">Account</a>
+  </nav>
+
+  <div class="topbar-actions">
+    <span class="user-label"><%= user.username %> · <%= user.role %></span>
+    <a href="/auth/logout" class="button logout">Sign out</a>
+  </div>
+</header>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profiles - Insighta</title>
+  <link rel="stylesheet" href="/styles/app.css" />
+</head>
+<body>
+  <%- include('partials/nav', { user, activePage: 'profiles' }) %>
+
+  <main class="page-container">
+    <section class="page-header">
+      <div>
+        <h1>Profiles</h1>
+        <p>Browse, filter and manage your profile records.</p>
+      </div>
+      <div class="page-actions">
+        <a href="/search" class="button secondary">Search Profiles</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form class="filter-bar" method="GET" action="/profiles">
+        <input type="text" name="q" value="<%= query %>" placeholder="Search by name, country, gender..." />
+        <button type="submit" class="button">Filter</button>
+      </form>
+
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+
+      <% if (!profiles || profiles.length === 0) { %>
+        <div class="empty-state">
+          <p>No profiles match your criteria.</p>
+          <p>Try a broader search or create a new profile if you have admin access.</p>
+        </div>
+      <% } else { %>
+        <div class="table-card">
+          <div class="table-row table-head">
+            <div>Name</div>
+            <div>Age</div>
+            <div>Gender</div>
+            <div>Country</div>
+            <div>Actions</div>
+          </div>
+
+          <% profiles.forEach(profile => { %>
+            <div class="table-row">
+              <div><a class="link-button" href="/profiles/<%= profile.id %>"><%= profile.name || 'N/A' %></a></div>
+              <div><%= profile.age || 'N/A' %></div>
+              <div><%= profile.gender || 'N/A' %></div>
+              <div><%= profile.country_name || profile.country_id || 'N/A' %></div>
+              <div>
+                <a class="small-link" href="/profiles/<%= profile.id %>">View</a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="pagination">
+          <% if (page > 1) { %>
+            <a href="/profiles?page=<%= page - 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="button secondary">Previous</a>
+          <% } %>
+          <span>Page <%= page %></span>
+          <% if (profiles.length > 0) { %>
+            <a href="/profiles?page=<%= page + 1 %><%= query ? '&q=' + encodeURIComponent(query) : '' %>" class="button secondary">Next</a>
+          <% } %>
+        </div>
+      <% } %>
+    </section>
+
+    <% if (user.role === 'admin') { %>
+      <section class="panel small-panel">
+        <h2>Create New Profile</h2>
+        <form action="/profiles" method="POST" class="create-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="text" name="name" placeholder="Profile name" required />
+          <button type="submit" class="button">Create Profile</button>
+        </form>
+      </section>
+    <% } %>
+  </main>
+</body>
+</html>
