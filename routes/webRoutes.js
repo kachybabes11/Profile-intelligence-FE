@@ -121,7 +121,8 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
     metrics: {
       totalProfiles: data.total || 0,
       totalPages: data.total_pages || 1
-    }
+    },
+    error: null
   });
 });
 
