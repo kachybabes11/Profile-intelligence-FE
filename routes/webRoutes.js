@@ -47,23 +47,30 @@ async function ensureAuth(req, res, next) {
 }
 
 router.get("/", (req, res) => {
+  if (req.cookies?.accessToken) {
+    return res.redirect("/dashboard");
+  }
+
   res.render("login", {
     oauthUrl: `${getBackendUrl()}/auth/github`
   });
 });
 
 router.get("/auth/callback", (req, res) => {
-  const { accessToken, refreshToken } = req.query;
+  const accessToken = req.query.accessToken || req.query.access_token || req.query.token || req.query.access;
+  const refreshToken = req.query.refreshToken || req.query.refresh_token || req.query.refresh;
   const isProduction = process.env.NODE_ENV === "production";
 
-  if (accessToken && refreshToken) {
+  if (accessToken) {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: "lax",
       path: "/"
     });
+  }
 
+  if (refreshToken) {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: isProduction,
