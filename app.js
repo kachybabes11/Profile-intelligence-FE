@@ -2,6 +2,7 @@ import express from "express";
 import methodOverride from "method-override";
 import webRoutes from "./routes/webRoutes.js";
 import cookieParser from "cookie-parser";
+import csurf from "csurf";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.static("public"));
 app.use(methodOverride("_method"));
 
 app.use(cookieParser());
+app.use(csurf({ cookie: true }));
 
 // EJS
 app.set("view engine", "ejs");

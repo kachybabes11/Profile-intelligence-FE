@@ -127,46 +127,43 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
 
 // ============ PROFILES LIST ============
 router.get("/profiles", ensureAuth, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const query = req.query.q || '';
-
   try {
-    const backendUrl = getBackendUrl();
-    let url = `${backendUrl}/api/profiles?page=${page}&limit=10`;
-    
-    if (query.trim()) {
-      url = `${backendUrl}/api/profiles/search?q=${encodeURIComponent(query)}&page=${page}&limit=10`;
-    }
+    const page = parseInt(req.query.page) || 1;
+    const query = req.query.q || "";
 
-    const response = await fetch(url, {
-      headers: buildBackendHeaders(req)
-    });
+    const backendUrl = getBackendUrl();
+
+    const response = await fetch(
+      `${backendUrl}/api/v1/profiles?page=${page}&limit=10&q=${encodeURIComponent(query)}`,
+      {
+        headers: buildBackendHeaders(req),
+      }
+    );
 
     if (!response.ok) {
-      if (response.status === 401) {
-        return res.redirect("/");
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`API error: ${response.status}`);
     }
 
     const data = await response.json();
+
     return res.render("profiles", {
       user: req.user,
       profiles: data.data || [],
-      pagination: data.pagination || {},
       page,
       query,
-      error: null
+      csrfToken: req.csrfToken(),   // ✅ THIS FIXES YOUR ERROR
+      error: null,
     });
   } catch (error) {
-    console.error('Profiles error:', error);
+    console.error("Profiles error:", error);
+
     return res.render("profiles", {
       user: req.user,
       profiles: [],
-      pagination: {},
-      page,
-      query: '',
-      error: "Failed to load profiles. Please try again."
+      page: 1,
+      query: "",
+      csrfToken: req.csrfToken(),   // 
+      error: "Failed to load profiles",
     });
   }
 });

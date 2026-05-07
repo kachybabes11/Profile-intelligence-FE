@@ -298,7 +298,7 @@ body {
   <% if (user?.role === "admin") { %>
     <div class="create-profile">
       <form action="/profiles" method="POST" class="profile-form">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="hidden" name="_csrf" value="<%= csrfToken || '' %>" />
         <input type="text" name="name" placeholder="Enter profile name" required />
         <button type="submit" class="create-btn">Create Profile</button>
       </form>
