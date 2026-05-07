@@ -3,6 +3,212 @@
 <head>
   <title>Profiles - Insighta</title>
   <link rel="stylesheet" href="/styles/dashboard.css">
+  <style>
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f8fb;
+  color: #1f2937;
+}
+
+/* MAIN CONTAINER */
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* TITLE */
+.container h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+/* ERROR */
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* SEARCH BAR */
+.search-section {
+  margin: 20px 0;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-form input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+.search-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.search-btn:hover {
+  background: #1d4ed8;
+}
+
+.clear-search {
+  align-self: center;
+  font-size: 13px;
+  color: #ef4444;
+  text-decoration: none;
+}
+
+/* CREATE FORM */
+.create-profile {
+  margin: 20px 0;
+}
+
+.profile-form {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.create-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #059669;
+}
+
+/* EMPTY STATE */
+.no-profiles {
+  text-align: center;
+  padding: 30px;
+  color: #6b7280;
+}
+
+/* TABLE */
+.sheet {
+  margin-top: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e5e7eb;
+  align-items: center;
+  background: #fff;
+  font-size: 14px;
+}
+
+.table-header {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+.row:hover {
+  background: #f9fafb;
+}
+
+/* LINKS */
+.profile-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.profile-link:hover {
+  text-decoration: underline;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.view-btn {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.page-btn:hover {
+  background: #1d4ed8;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #6b7280;
+}
+  </style>
 </head>
 <body>
   <%- include('partials/nav', { user, activePage: 'profiles' }) %>
