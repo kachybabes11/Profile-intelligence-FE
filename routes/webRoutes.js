@@ -84,7 +84,7 @@ router.get("/auth/callback", (req, res) => {
 router.get("/dashboard", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles?limit=5`, {
+    const response = await fetch(`${backendUrl}/api/profiles?limit=5`, {
       headers: buildBackendHeaders(req)
     });
 
@@ -105,9 +105,14 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Dashboard error:', error);
-    return res.render("dashboard", {
+      return res.render("dashboard", {
       user: req.user,
       profiles: [],
+      page: page || 1,
+      metrics: {
+        totalProfiles: 0,
+        currentPage: page || 1
+      },
       error: "Failed to load dashboard. Please try again."
     });
   }
