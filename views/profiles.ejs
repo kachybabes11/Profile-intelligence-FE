@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Profiles - Insighta</title>
-  <link rel="stylesheet" href="/styles/dashboard.css">
+  <link rel="stylesheet" href="/styles/app.css">
   <style>
 
 body {
@@ -213,17 +213,10 @@ body {
 <body>
   <%- include('partials/nav', { user, activePage: 'profiles' }) %>
 
-<header class="header">
-  <div class="left">
-    <h2>Profiles</h2>
-    <div class="sub">Profile Intelligence System</div>
-  </div>
-
-  <div class="right">
-    <span class="user">
-      <%= user?.username || "Guest" %>
-      (<%= user?.role || "user" %>)
-    </span>
+     <div>
+        <h1>Profiles</h1>
+        <p>Manage profiles.</p>
+      </div>
 
     <% if (user?.role === "admin") { %>
       <a href="/export">Export CSV</a>
