@@ -93,13 +93,12 @@ router.get("/dashboard", ensureAuth, async (req, res) => {
     }
 
     const data = await response.json();
-    
         return res.render("dashboard", {
       user: req.user,
       profiles: data.data || [],
       page: page || 1,
       metrics: {
-        totalProfiles: data.total || data.data?.length || 0,
+        totalProfiles: data.total || (data.data?.length ?? 0),
         currentPage: page || 1
       },
       error: null
