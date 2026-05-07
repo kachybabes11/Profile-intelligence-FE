@@ -121,10 +121,10 @@ router.get("/profiles", ensureAuth, async (req, res) => {
 
   try {
     const backendUrl = getBackendUrl();
-    let url = `${backendUrl}/api/v1/profiles?page=${page}&limit=10`;
+    let url = `${backendUrl}/api/profiles?page=${page}&limit=10`;
     
     if (query.trim()) {
-      url = `${backendUrl}/api/v1/profiles/search?q=${encodeURIComponent(query)}&page=${page}&limit=10`;
+      url = `${backendUrl}/api/profiles/search?q=${encodeURIComponent(query)}&page=${page}&limit=10`;
     }
 
     const response = await fetch(url, {
@@ -164,7 +164,7 @@ router.get("/profiles", ensureAuth, async (req, res) => {
 router.get("/profiles/:id", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/${req.params.id}`, {
+    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
       headers: buildBackendHeaders(req)
     });
 
@@ -197,7 +197,7 @@ router.get("/profiles/:id", ensureAuth, async (req, res) => {
 router.post("/profiles", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles`, {
+    const response = await fetch(`${backendUrl}/api/profiles`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ router.post("/profiles", ensureAuth, async (req, res) => {
 router.delete("/profiles/:id", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/${req.params.id}`, {
+    const response = await fetch(`${backendUrl}/api/profiles/${req.params.id}`, {
       method: 'DELETE',
       headers: buildBackendHeaders(req)
     });
@@ -241,7 +241,7 @@ router.delete("/profiles/:id", ensureAuth, async (req, res) => {
 router.get("/export", ensureAuth, async (req, res) => {
   try {
     const backendUrl = getBackendUrl();
-    const response = await fetch(`${backendUrl}/api/v1/profiles/export`, {
+    const response = await fetch(`${backendUrl}/api/profiles/export`, {
       headers: buildBackendHeaders(req)
     });
 
