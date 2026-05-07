@@ -8,11 +8,12 @@ const getBackendUrl = () => (process.env.BACKEND_URL || "").replace(/\/$/, "");
 
 function buildBackendHeaders(req) {
   const headers = {
-    "x-api-version": "1"
+    "x-api-version": "1",
+    "Content-Type": "application/json"
   };
 
-  if (req.headers?.cookie) {
-    headers.Cookie = req.headers.cookie;
+  if (req.cookies?.accessToken) {
+    headers.Authorization = `Bearer ${req.cookies.accessToken}`;
   }
 
   return headers;
@@ -52,6 +53,31 @@ router.get("/", (req, res) => {
     oauthUrl: `${getBackendUrl()}/auth/github`,
     error: req.query.error || null
   });
+});
+
+// ============ AUTH CALLBACK ============
+router.get("/auth/callback", (req, res) => {
+  const { access_token, refresh_token } = req.query;
+
+  if (!access_token || !refresh_token) {
+    return res.redirect("/?error=missing_tokens");
+  }
+
+  res.cookie("accessToken", access_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 3 * 60 * 1000,
+  });
+
+  res.cookie("refreshToken", refresh_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 5 * 60 * 1000,
+  });
+
+  return res.redirect("/dashboard");
 });
 
 // ============ DASHBOARD ============
