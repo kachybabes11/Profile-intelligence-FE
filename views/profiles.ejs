@@ -3,6 +3,293 @@
 <head>
   <title>Profiles - Insighta</title>
   <link rel="stylesheet" href="/styles/dashboard.css">
+  <style>
+    /* =========================
+   GLOBAL RESET
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 30px;
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
+}
+
+.header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.right a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.right a:hover {
+  background: #1f2937;
+  color: #fff;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white !important;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+.user {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+.container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.container h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+/* =========================
+   ERROR
+========================= */
+.error-message {
+  background: #7f1d1d;
+  color: #fecaca;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+/* =========================
+   SEARCH
+========================= */
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0b1220;
+  color: #fff;
+  outline: none;
+}
+
+.search-btn {
+  padding: 10px 15px;
+  background: #3b82f6;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.search-btn:hover {
+  background: #2563eb;
+}
+
+.clear-search {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  align-self: center;
+}
+
+/* =========================
+   CREATE FORM
+========================= */
+.create-profile {
+  margin-bottom: 20px;
+}
+
+.profile-form {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-form input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0b1220;
+  color: white;
+}
+
+.create-btn {
+  background: #10b981;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #059669;
+}
+
+/* =========================
+   TABLE / SHEET
+========================= */
+.sheet {
+  background: #111827;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1f2937;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 14px 16px;
+  border-bottom: 1px solid #1f2937;
+  align-items: center;
+}
+
+.table-header {
+  background: #0b1220;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.row:hover {
+  background: #0b1220;
+}
+
+.profile-link {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.profile-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.view-btn:hover {
+  background: #2563eb;
+}
+
+.delete-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.no-profiles {
+  padding: 20px;
+  background: #111827;
+  border-radius: 10px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+
+.page-btn {
+  background: #1f2937;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: white;
+}
+
+.page-btn:hover {
+  background: #374151;
+}
+
+.page-info {
+  color: #94a3b8;
+}
+  </style>
 </head>
 <body>
 
