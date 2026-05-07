@@ -134,7 +134,7 @@ router.get("/profiles", ensureAuth, async (req, res) => {
     const backendUrl = getBackendUrl();
 
     const response = await fetch(
-      `${backendUrl}/api/v1/profiles?page=${page}&limit=10&q=${encodeURIComponent(query)}`,
+      `${backendUrl}/api/profiles?page=${page}&limit=10&q=${encodeURIComponent(query)}`,
       {
         headers: buildBackendHeaders(req),
       }
