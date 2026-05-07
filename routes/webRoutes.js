@@ -270,6 +270,50 @@ router.get("/export", ensureAuth, async (req, res) => {
   }
 });
 
+//query
+router.get("/search", ensureAuth, async (req, res) => {
+  const searchQuery = req.query.q || "";
+  const page = parseInt(req.query.page) || 1;
+
+  try {
+    const backendUrl = getBackendUrl();
+
+    let url = `${backendUrl}/api/profiles/search?q=${encodeURIComponent(searchQuery)}&page=${page}&limit=10`;
+
+    const response = await fetch(url, {
+      headers: buildBackendHeaders(req)
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        return res.redirect("/");
+      }
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return res.render("search", {
+      user: req.user,
+      profiles: data.data || [],
+      searchQuery,
+      page,
+      error: null
+    });
+
+  } catch (error) {
+    console.error("Search error:", error);
+
+    return res.render("search", {
+      user: req.user,
+      profiles: [],
+      searchQuery,
+      page,
+      error: "Search failed. Please try again."
+    });
+  }
+});
+
 // ============ ACCOUNT PAGE ============
 router.get("/account", ensureAuth, async (req, res) => {
   return res.render("account", {
