@@ -27,6 +27,59 @@ body {
   margin-top: 0;
   font-size: 22px;
 }
+/* ===== PAGE HEADER (below topbar only) ===== */
+.page-header {
+  max-width: 1100px;
+  margin: 25px auto 10px auto;
+  padding: 20px 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* TITLE */
+.page-title h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #111827;
+}
+
+.page-title p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ACTIONS */
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* EXPORT BUTTON */
+.export-btn {
+  background: #111827;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.export-btn:hover {
+  background: #000000;
+}
+
+/* OPTIONAL: keeps spacing consistent with your topbar */
+body {
+  background: #f6f8fb;
+}
 
 /* ERROR */
 .error-message {
@@ -212,18 +265,16 @@ body {
 </head>
 <body>
   <%- include('partials/nav', { user, activePage: 'profiles' }) %>
+<header class="page-header">
+  <div class="page-title">
+    <h1>Profiles</h1>
+    <p>Manage profiles.</p>
+  </div>
 
-     <div>
-        <h1>Profiles</h1>
-        <p>Manage profiles.</p>
-      </div>
-
+  <div class="page-actions">
     <% if (user?.role === "admin") { %>
-      <a href="/export">Export CSV</a>
+      <a href="/export" class="btn export-btn">Export CSV</a>
     <% } %>
-
-    <a href="/account">Account</a>
-    <a href="/auth/logout" class="logout-btn">Logout</a>
   </div>
 </header>
 
